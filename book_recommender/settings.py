@@ -27,7 +27,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'api-book-recommender.herokuapp.com/'
+    'https://api-book-recommender.herokuapp.com/'
 ]
 
 # Application definition
