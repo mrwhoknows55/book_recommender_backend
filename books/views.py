@@ -1,9 +1,7 @@
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework import generics
 
 from books.models import Book
 from books.serializers import BookSerializer
-from rest_framework import generics
 
 
 class GetBooksView(generics.ListAPIView):
