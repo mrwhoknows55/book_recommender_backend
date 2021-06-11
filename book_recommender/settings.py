@@ -24,7 +24,11 @@ SECRET_KEY = 'y+@6pa8m00zz++05!(_ow_ls1919y%$&u@*8vy3wf#*t+-*@gy'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'api-book-recommender.herokuapp.com/'
+]
 
 # Application definition
 
@@ -127,4 +131,5 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
     'http://127.0.0.1:3000',
+    'https://book-recommender-g2.netlify.app/'
 )
