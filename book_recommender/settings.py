@@ -126,6 +126,10 @@ AUTH_USER_MODEL = 'users.User'
 
 django_heroku.settings(locals())
 
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE_FORCE_ALL = True
+SESSION_COOKIE_SECURE = True
+
 ALLOWED_HOSTS = [
     'api-book-recommender.herokuapp.com',
     'https://api-book-recommender.herokuapp.com',
