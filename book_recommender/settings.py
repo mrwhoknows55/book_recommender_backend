@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [
     'https://api-book-recommender.herokuapp.com/'
 ]
 
+blackListedTokens = set()
 # Application definition
 
 INSTALLED_APPS = [
@@ -130,8 +131,9 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'users.User'
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = (
+CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'https://book-recommender-g2.netlify.app/'
-)
+    'https://book-recommender-g2.netlify.app/',
+    'https://api-book-recommender.herokuapp.com/'
+]
