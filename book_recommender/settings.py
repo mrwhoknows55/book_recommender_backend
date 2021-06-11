@@ -9,10 +9,13 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import os
 from pathlib import Path
+import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from django.contrib import staticfiles
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -24,8 +27,7 @@ SECRET_KEY = 'y+@6pa8m00zz++05!(_ow_ls1919y%$&u@*8vy3wf#*t+-*@gy'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+blackListedTokens = set()
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,10 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'users'
+    'users',
+    'books'
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -72,14 +76,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'book_recommender.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'book_recommender',
-        'USER': 'book_admin',
-        'PASSWORD': 'password'
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'postgres'),
+        'PORT': os.getenv('DB_PORT', '5432'),
+        'HOST': os.getenv('DB_HOST_URL', 'localhost'),
+        'USER': os.getenv('DB_USERNAME', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'password')
     }
 }
 
@@ -114,12 +119,35 @@ USE_L10N = True
 
 USE_TZ = True
 
+AUTH_USER_MODEL = 'users.User'
+
+django_heroku.settings(locals())
+
+ALLOWED_HOSTS = [
+    'api-book-recommender.herokuapp.com',
+    'https://api-book-recommender.herokuapp.com',
+    'localhost',
+    '127.0.0.1'
+]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://book-recommender-g2.netlify.app',
+    'https://api-book-recommender.herokuapp.com'
+]
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+PROJECT_ROOT = os.path.join(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+# Extra lookup directories for collectstatic to find static files
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'static'),
+)
 
-AUTH_USER_MODEL = 'users.User'
-
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_CREDENTIALS = True
+#  Add configuration for static files storage using whitenoise
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
