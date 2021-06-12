@@ -50,11 +50,11 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'corsheaders',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware'
+    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsPostCsrfMiddleware'
 ]
 
 ROOT_URLCONF = 'book_recommender.urls'
@@ -148,7 +148,7 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
-    'auth',
+    'Authentication',
     'Cookie',
     'Set-Cookie',
 ]
