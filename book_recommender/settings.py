@@ -14,6 +14,7 @@ from pathlib import Path
 import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from corsheaders.defaults import default_headers
 from django.contrib import staticfiles
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -143,6 +144,12 @@ CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:3000',
     'https://book-recommender-g2.netlify.app',
     'https://api-book-recommender.herokuapp.com'
+]
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'auth',
+    'Cookie',
+    'Set-Cookie',
 ]
 
 # Static files (CSS, JavaScript, Images)
