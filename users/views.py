@@ -13,7 +13,20 @@ class SignUpView(APIView):
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
+        response = Response()
+        user_without_id = serializer.data
+        response.data = user_without_id
+
+        user = User.objects.filter(email=user_without_id['email']).first()
+        payload = {
+            'id': user.id,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            'iat': datetime.datetime.utcnow()
+        }
+        token = jwt.encode(payload, 'secret', algorithm='HS256')
+        response.data["token"] = token
+
+        return response
 
 
 class LoginView(APIView):
@@ -38,7 +51,6 @@ class LoginView(APIView):
         token = jwt.encode(payload, 'secret', algorithm='HS256')
 
         response = Response()
-        response.set_cookie(key='auth', value=token, httponly=True)
         response.data = {
             'token': token,
             'success': True
@@ -48,8 +60,7 @@ class LoginView(APIView):
 
 class UserView(APIView):
     def get(self, request):
-        token = request.COOKIES.get('auth')
-
+        token = request.headers.get('Authentication')
         if not token:
             raise AuthenticationFailed('Unauthenticated')
 
@@ -66,7 +77,7 @@ class UserView(APIView):
 
 class LogoutView(APIView):
     def post(self, request):
-        token = request.COOKIES.get('auth')
+        token = request.headers.get('Authentication')
 
         if not token:
             raise AuthenticationFailed('Not Logged In')
