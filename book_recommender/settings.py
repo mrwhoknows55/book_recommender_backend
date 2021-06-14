@@ -83,9 +83,6 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DB_NAME', 'postgres'),
-        'OPTIONS': {
-            'options': '-c search_path=' + os.getenv('DB_SCHEMA_NAME', 'book_recommender')
-        },
         'PORT': os.getenv('DB_PORT', '5432'),
         'HOST': os.getenv('DB_HOST_URL', 'localhost'),
         'USER': os.getenv('DB_USERNAME', 'postgres'),
