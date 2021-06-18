@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import GetBooksView
+from .views import GetBooksMetaView, GetBookDetailView
 
 urlpatterns = [
-    path('books', GetBooksView.as_view())
+    path('books/', GetBooksMetaView.as_view()),
+    path('books/<int:pk>/', GetBookDetailView.as_view())
 ]
