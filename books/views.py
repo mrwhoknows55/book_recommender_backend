@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.filters import OrderingFilter, SearchFilter
 
 from books.models import Book
 from books.serializers import BookMetaInfoSerializer, BookDetailsSerializer
@@ -17,6 +18,9 @@ class GetBooksMetaView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookMetaInfoSerializer
     pagination_class = StandardResultsSetPagination
+    filter_backends = (OrderingFilter, SearchFilter)
+    ordering_fields = ['book_id', 'isbn', 'title', 'authors']
+    search_fields = ['isbn', 'title', 'authors']
 
 
 class GetBookDetailView(APIView):
