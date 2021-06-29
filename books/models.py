@@ -25,7 +25,3 @@ class Book(models.Model):
     image_url = models.TextField()
     small_image_url = models.TextField()
     avg_rating = models.FloatField()
-
-    class Meta:
-        managed = False
-        db_table = 'books_book_view'
