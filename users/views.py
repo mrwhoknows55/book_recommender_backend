@@ -128,7 +128,7 @@ class GetLibraryView(generics.ListAPIView):
     pagination_class = StandardResultsSetPagination
     filter_backends = (OrderingFilter, SearchFilter)
     ordering_fields = ['book_id', 'isbn', 'title', 'authors', 'avg_rating', 'ratings_count']
-    search_fields = ['isbn', 'title', 'authors']
+    search_fields = ['isbn', 'title', 'genre', 'authors']
 
     def get_queryset(self):
         token = self.request.headers.get('Authentication')

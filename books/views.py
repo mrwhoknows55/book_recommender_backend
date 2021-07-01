@@ -19,8 +19,8 @@ class GetBooksMetaView(generics.ListAPIView):
     serializer_class = BookMetaInfoSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = (OrderingFilter, SearchFilter)
-    ordering_fields = ['book_id', 'isbn', 'title', 'authors', 'avg_rating', 'ratings_count']
-    search_fields = ['isbn', 'title', 'authors']
+    ordering_fields = ['book_id', 'isbn', 'title', 'authors', 'avg_rating', 'genre', 'ratings_count']
+    search_fields = ['isbn', 'title', 'authors', 'genre']
 
 
 class GetBookDetailView(APIView):
