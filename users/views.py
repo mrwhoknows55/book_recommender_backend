@@ -1,9 +1,14 @@
 import datetime
 import jwt
+from rest_framework import generics
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from books.models import Book
+from books.serializers import BookMetaInfoSerializer
+from books.views import StandardResultsSetPagination
 from .models import User
 from .serializers import UserSerializer
 
@@ -85,6 +90,59 @@ class LogoutView(APIView):
         response = Response()
         response.delete_cookie('auth')
         response.data = {
-            'sucess': True
+            'success': True
         }
         return response
+
+
+class PostLibraryView(APIView):
+    def post(self, request, pk):
+        token = request.headers.get('Authentication')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
+        user = User.objects.get(id=payload['id'])
+        if user:
+            if Book.objects.filter(book_id=pk).exists():
+                book = Book.objects.get(book_id=pk)
+                user.library.add(book)
+                response = Response()
+                response.data = {
+                    'success': True,
+                    'message': 'Book Added Successfully'
+                }
+                return response
+            else:
+                return Response({'success': False, 'message': 'Wrong Book ID'})
+        else:
+            raise AuthenticationFailed('Unauthenticated')
+
+
+class GetLibraryView(generics.ListAPIView):
+    serializer_class = BookMetaInfoSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = (OrderingFilter, SearchFilter)
+    ordering_fields = ['book_id', 'isbn', 'title', 'authors', 'avg_rating', 'ratings_count']
+    search_fields = ['isbn', 'title', 'genre', 'authors']
+
+    def get_queryset(self):
+        token = self.request.headers.get('Authentication')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
+        user = User.objects.filter(id=payload['id']).first()
+
+        if user:
+            return user.library.all()
+        else:
+            raise AuthenticationFailed('Unauthenticated')
