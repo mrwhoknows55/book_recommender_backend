@@ -140,7 +140,7 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'https://book-recommender-g2.netlify.app',
+    'https://book-recommender-frontend.vercel.app/',
     'https://api-book-recommender.herokuapp.com'
 ]
 
