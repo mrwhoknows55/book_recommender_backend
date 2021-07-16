@@ -28,7 +28,9 @@ def combined_features(data):
 # requires book_id on which books will be recommended & count of recommendation returns list of recommended book_id
 def get_recommendation(selected_book_id, count):
     book_data = os.path.join(settings.STATICFILES_DIRS[0] + '/books.csv')
-    df = pd.read_csv(book_data, encoding='unicode_escape', error_bad_lines=False)
+    df = pd.read_csv(book_data, encoding='unicode_escape', low_memory=True, error_bad_lines=False)
+    columns = ['genre', 'authors', 'original_title']
+    df = df[columns]
 
     # create a column to store combined features
     df['combined_features'] = combined_features(df)
