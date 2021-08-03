@@ -96,6 +96,34 @@ class LogoutView(APIView):
 
 
 class PostLibraryView(APIView):
+
+    def delete(self, request, pk):
+        token = request.headers.get('Authentication')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
+        user = User.objects.get(id=payload['id'])
+
+        if user:
+            if Book.objects.filter(book_id=pk).exists():
+                book = Book.objects.get(book_id=pk)
+                user.library.remove(book)
+                response = Response()
+                response.data = {
+                    'success': True,
+                    'message': 'Book Removed Successfully'
+                }
+                return response
+            else:
+                return Response({'success': False, 'message': 'Wrong Book ID'})
+        else:
+            raise AuthenticationFailed('Unauthenticated')
+
     def post(self, request, pk):
         token = request.headers.get('Authentication')
         if not token:
