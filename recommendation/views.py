@@ -30,7 +30,7 @@ def combined_features(data):
 def get_recommendation(selected_book_id, count):
     book_data = os.path.join(settings.STATICFILES_DIRS[0] + '/books.csv')
     df = pd.read_csv(book_data, encoding='unicode_escape', low_memory=True, error_bad_lines=False)
-    columns = ['genre', 'authors', 'original_title']
+    columns = ['book_id', 'genre', 'authors', 'original_title']
     df = df[columns]
 
     # create a column to store combined features
@@ -48,7 +48,7 @@ def get_recommendation(selected_book_id, count):
     # create a list of tuples in the form of (book_id, similarity score)
 
     # print(cs[selected_book_id])
-    scores = list(enumerate(cs[selected_book_id]))
+    scores = list(enumerate(cs[df.index[df['book_id'] == selected_book_id].tolist()[0]]))
 
     # sort the list of similar books in desc order
     sorted_scores = sorted(scores, key=lambda x: x[1], reverse=True)
@@ -75,12 +75,14 @@ def get_recommendation(selected_book_id, count):
 @background(schedule=3)
 def store_recommendations(user, selected_book_id, count):
     recommendation_titles = []
-    for i, bk_id in enumerate(get_recommendation(selected_book_id, count)):
+    recoms = get_recommendation(selected_book_id, count)
+    for i, bk_id in enumerate(recoms):
         recommendation_titles.append(bk_id)
 
     for book_title in recommendation_titles:
-        book = Book.objects.get(original_title=book_title)
-        user.recommendations.add(book)
+        book = Book.objects.filter(original_title=book_title).first()
+        if book:
+            user.recommendations.add(book)
 
 
 @background(schedule=3)
