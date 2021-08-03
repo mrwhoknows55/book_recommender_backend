@@ -1,4 +1,5 @@
 import datetime
+
 import jwt
 from rest_framework import generics
 from rest_framework.exceptions import AuthenticationFailed
@@ -9,6 +10,7 @@ from rest_framework.views import APIView
 from books.models import Book
 from books.serializers import BookMetaInfoSerializer
 from books.views import StandardResultsSetPagination
+from recommendation.views import store_recommendations, delete_recommendations
 from .models import User
 from .serializers import UserSerializer
 
@@ -113,6 +115,8 @@ class PostLibraryView(APIView):
             if Book.objects.filter(book_id=pk).exists():
                 book = Book.objects.get(book_id=pk)
                 user.library.remove(book)
+                # deletes recommendations based on this book in the background
+                delete_recommendations.now(user, pk, 7)
                 response = Response()
                 response.data = {
                     'success': True,
@@ -139,6 +143,8 @@ class PostLibraryView(APIView):
             if Book.objects.filter(book_id=pk).exists():
                 book = Book.objects.get(book_id=pk)
                 user.library.add(book)
+                # generates and stores recommendations based on lib in the background
+                store_recommendations.now(user, pk, 7)
                 response = Response()
                 response.data = {
                     'success': True,

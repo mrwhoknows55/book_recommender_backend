@@ -2,6 +2,7 @@ import os
 
 import jwt
 import pandas as pd
+from background_task import background
 from rest_framework import generics
 from rest_framework.exceptions import AuthenticationFailed
 from sklearn.feature_extraction.text import CountVectorizer
@@ -71,8 +72,29 @@ def get_recommendation(selected_book_id, count):
     return recommended_books
 
 
+@background(schedule=3)
+def store_recommendations(user, selected_book_id, count):
+    recommendation_titles = []
+    for i, bk_id in enumerate(get_recommendation(selected_book_id, count)):
+        recommendation_titles.append(bk_id)
+
+    for book_title in recommendation_titles:
+        book = Book.objects.get(original_title=book_title)
+        user.recommendations.add(book)
+
+
+@background(schedule=3)
+def delete_recommendations(user, selected_book_id, count):
+    recommendation_titles = []
+    for i, bk_id in enumerate(get_recommendation(selected_book_id, count)):
+        recommendation_titles.append(bk_id)
+
+    for book_title in recommendation_titles:
+        book = Book.objects.get(original_title=book_title)
+        user.recommendations.remove(book)
+
+
 class GetRecommendationsView(generics.ListAPIView):
-    queryset = Book.objects.values('book_id')
     serializer_class = BookMetaInfoSerializer
     pagination_class = StandardResultsSetPagination
 
@@ -83,27 +105,12 @@ class GetRecommendationsView(generics.ListAPIView):
 
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            # recommended_books_query_set = []
+            user = User.objects.filter(id=payload['id']).first()
+            if user:
+                return user.recommendations.all()
+            else:
+                raise AuthenticationFailed('Unauthenticated')
+
         except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed('Unauthenticated')
-
-        user = User.objects.filter(id=payload['id']).first()
-        if user:
-            ids = []
-            recommendation_titles = []
-
-            for books in user.library.all():
-                if books.book_id < 8000:
-                    ids.append(books.book_id)
-
-            for input_book_id in ids:
-                for i, bk_id in enumerate(get_recommendation(input_book_id, 5)):
-                    recommendation_titles.append(bk_id)
-
-            # print("RECOMM:", recommendation_titles)
-            recommended_books_query_set = []
-            for book_title in recommendation_titles:
-                recommended_books_query_set.extend(list(Book.objects.filter(original_title=book_title)))
-
-            return recommended_books_query_set
-        else:
             raise AuthenticationFailed('Unauthenticated')
