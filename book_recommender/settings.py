@@ -135,7 +135,10 @@ ALLOWED_HOSTS = [
     'api-book-recommender.herokuapp.com',
     'https://api-book-recommender.herokuapp.com',
     'localhost',
-    '127.0.0.1'
+    '0.0.0.0',
+    '127.0.0.1',
+    '13.233.142.101',
+    'books-api.mrwhoknows.com' 
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -143,7 +146,12 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'https://book-recommender-frontend.vercel.app',
-    'https://api-book-recommender.herokuapp.com'
+    'https://api-book-recommender.herokuapp.com',
+    'http://localhost',
+    'http://0.0.0.0',
+    'http://127.0.0.1',
+    'http://13.233.142.101',
+    'http://books-api.mrwhoknows.com' 
 ]
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
