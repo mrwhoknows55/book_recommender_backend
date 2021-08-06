@@ -116,7 +116,7 @@ class PostLibraryView(APIView):
                 book = Book.objects.get(book_id=pk)
                 user.library.remove(book)
                 # deletes recommendations based on this book in the background
-                delete_recommendations.now(user, pk, 7)
+                delete_recommendations(user, pk, 7)
                 response = Response()
                 response.data = {
                     'success': True,
@@ -144,7 +144,7 @@ class PostLibraryView(APIView):
                 book = Book.objects.get(book_id=pk)
                 user.library.add(book)
                 # generates and stores recommendations based on lib in the background
-                store_recommendations.now(user, pk, 7)
+                store_recommendations(user, pk, 7)
                 response = Response()
                 response.data = {
                     'success': True,

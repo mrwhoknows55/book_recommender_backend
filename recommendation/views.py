@@ -2,7 +2,6 @@ import os
 
 import jwt
 import pandas as pd
-from background_task import background
 from rest_framework import generics
 from rest_framework.exceptions import AuthenticationFailed
 from sklearn.feature_extraction.text import CountVectorizer
@@ -12,6 +11,7 @@ from book_recommender import settings
 from books.models import Book
 from books.serializers import BookMetaInfoSerializer
 from books.views import StandardResultsSetPagination
+from recommendation.utils import postpone
 from users.models import User
 
 
@@ -72,7 +72,7 @@ def get_recommendation(selected_book_id, count):
     return recommended_books
 
 
-@background(schedule=3)
+@postpone
 def store_recommendations(user, selected_book_id, count):
     recommendation_titles = []
     recoms = get_recommendation(selected_book_id, count)
@@ -83,9 +83,10 @@ def store_recommendations(user, selected_book_id, count):
         book = Book.objects.filter(original_title=book_title).first()
         if book:
             user.recommendations.add(book)
+    print("recommendations added")
 
 
-@background(schedule=3)
+@postpone
 def delete_recommendations(user, selected_book_id, count):
     recommendation_titles = []
     for i, bk_id in enumerate(get_recommendation(selected_book_id, count)):
@@ -94,6 +95,7 @@ def delete_recommendations(user, selected_book_id, count):
     for book_title in recommendation_titles:
         book = Book.objects.get(original_title=book_title)
         user.recommendations.remove(book)
+    print("recommendations removed")
 
 
 class GetRecommendationsView(generics.ListAPIView):
