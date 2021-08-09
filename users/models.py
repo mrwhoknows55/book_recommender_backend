@@ -10,6 +10,7 @@ class User(AbstractUser):
     password = models.CharField(max_length=255)
     library = models.ManyToManyField(Book, related_name="user")
     recommendations = models.ManyToManyField(Book, related_name="recommended_user")
+    wishlist = models.ManyToManyField(Book, related_name="wishlisted_user")
     username = None
 
     USERNAME_FIELD = 'email'

@@ -96,6 +96,7 @@ class LogoutView(APIView):
         }
         return response
 
+
 # Add or Remove Books From Lib
 class PostLibraryView(APIView):
 
@@ -178,5 +179,88 @@ class GetLibraryView(generics.ListAPIView):
 
         if user:
             return user.library.all()
+        else:
+            raise AuthenticationFailed('Unauthenticated')
+
+
+# Get Books From WishList
+class GetWishlistView(generics.ListAPIView):
+    serializer_class = BookMetaInfoSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = (OrderingFilter, SearchFilter)
+    ordering_fields = ['book_id', 'isbn', 'title', 'authors', 'avg_rating', 'ratings_count']
+    search_fields = ['isbn', 'title', 'genre', 'authors']
+
+    def get_queryset(self):
+        token = self.request.headers.get('Authentication')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
+        user = User.objects.filter(id=payload['id']).first()
+
+        if user:
+            return user.wishlist.all()
+        else:
+            raise AuthenticationFailed('Unauthenticated')
+
+
+# Add or Remove Books From WishList
+class PostWishlistView(APIView):
+
+    def delete(self, request, pk):
+        token = request.headers.get('Authentication')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
+        user = User.objects.get(id=payload['id'])
+
+        if user:
+            if Book.objects.filter(book_id=pk).exists():
+                book = Book.objects.get(book_id=pk)
+                user.wishlist.remove(book)
+                response = Response()
+                response.data = {
+                    'success': True,
+                    'message': 'Book Removed From Wishlist Successfully'
+                }
+                return response
+            else:
+                return Response({'success': False, 'message': 'Wrong Book ID'})
+        else:
+            raise AuthenticationFailed('Unauthenticated')
+
+    def post(self, request, pk):
+        token = request.headers.get('Authentication')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
+        user = User.objects.get(id=payload['id'])
+        if user:
+            if Book.objects.filter(book_id=pk).exists():
+                book = Book.objects.get(book_id=pk)
+                user.wishlist.add(book)
+                response = Response()
+                response.data = {
+                    'success': True,
+                    'message': 'Book Added To Wishlist Successfully'
+                }
+                return response
+            else:
+                return Response({'success': False, 'message': 'Wrong Book ID'})
         else:
             raise AuthenticationFailed('Unauthenticated')
