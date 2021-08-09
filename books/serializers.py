@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Book
+
+from .models import Book, Genre
 
 
 class BookMetaInfoSerializer(serializers.ModelSerializer):
@@ -26,3 +27,9 @@ class BookDetailsSerializer(serializers.ModelSerializer):
             "ratings_count",
             "work_ratings_count"
         ]
+
+
+class GenereSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ["genre"]

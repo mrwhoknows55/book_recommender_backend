@@ -1,11 +1,11 @@
 from rest_framework import generics
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.filters import OrderingFilter, SearchFilter
 
-from books.models import Book
-from books.serializers import BookMetaInfoSerializer, BookDetailsSerializer
+from books.models import Book, Genre
+from books.serializers import BookMetaInfoSerializer, BookDetailsSerializer, GenereSerializer
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -28,3 +28,9 @@ class GetBookDetailView(APIView):
         book_details = Book.objects.get(book_id=pk)
         serializer = BookDetailsSerializer(book_details)
         return Response(serializer.data)
+
+
+class GetGeneresView(generics.ListAPIView):
+    queryset = Genre.objects.all()
+    serializer_class = GenereSerializer
+    pagination_class = None

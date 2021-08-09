@@ -15,3 +15,7 @@ class Book(models.Model):
     avg_rating = models.FloatField()
     ratings_count = models.IntegerField()
     work_ratings_count = models.IntegerField()
+
+
+class Genre(models.Model):
+    genre = models.TextField(max_length=50, null=False, unique=True)
