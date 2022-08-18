@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 from pathlib import Path
-import django_heroku
 
+import django_heroku
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from corsheaders.defaults import default_headers
 from django.contrib import staticfiles
@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'users',
-    'books'
+    'books',
+    'recommendation'
 ]
 
 MIDDLEWARE = [
@@ -130,18 +131,28 @@ SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 SESSION_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = [
-    'api-book-recommender.herokuapp.com',
-    'https://api-book-recommender.herokuapp.com',
     'localhost',
-    '127.0.0.1'
+    '0.0.0.0',
+    '127.0.0.1',
+    '35.154.146.3',
+    'books-api.mrwhoknows.com'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'https://book-recommender-frontend.vercel.app/',
-    'https://api-book-recommender.herokuapp.com'
+    'http://book-recommender.vercel.app',
+    'https://book-recommender.vercel.app',
+    'http://book-recommender.mrwhoknows.com',
+    'https://book-recommender.mrwhoknows.com',
+    'http://localhost',
+    'http://0.0.0.0',
+    'http://127.0.0.1',
+    'http://35.154.146.3',
+    'https://35.154.146.3',
+    'http://books-api.mrwhoknows.com',
+    'https://books-api.mrwhoknows.com'
 ]
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
@@ -153,13 +164,8 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
-PROJECT_ROOT = os.path.join(os.path.abspath(__file__))
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
-# Extra lookup directories for collectstatic to find static files
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'static'),
-)
 
 #  Add configuration for static files storage using whitenoise
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
